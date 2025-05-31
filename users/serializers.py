@@ -1,6 +1,7 @@
-# users/serializers.py
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -72,6 +73,33 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'email'
+
+    def validate(self, attrs):
+        credentials = {
+            'email': attrs.get('email'),
+            'password': attrs.get('password')
+        }
+
+        user = authenticate(**credentials)
+
+        if user:
+            if not user.is_active:
+                raise AuthenticationFailed('Account is not activated')
+
+            refresh = self.get_token(user)
+            data = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': user,
+            }
+
+            return data
+        else:
+            raise AuthenticationFailed('User not registered')
 
 
 class VerifyAccountSerializer(serializers.Serializer):

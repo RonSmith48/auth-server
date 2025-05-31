@@ -63,6 +63,7 @@ def me_view(request):
     excluding sensitive fields and including full_name.
     """
     serializer = UserSerializer(request.user)
+    print(serializer.data)  # Debugging line to check serialized data
     return Response(serializer.data)
 
 
