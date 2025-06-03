@@ -141,5 +141,6 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTH_MODE = os.getenv('AUTH_MODE', 'HOME')
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000',
+                        'http://127.0.0.1:8001', 'http://localhost:8001']
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
