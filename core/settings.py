@@ -12,22 +12,26 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ENV = os.getenv('ENV', 'dev') 
+dotenv_path = BASE_DIR / f'.env.{ENV}'
+load_dotenv(dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ty+m&$p9ujjuzke6cwmbp9p$cs_h@getlsbr2%djkamw^=mgts'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
@@ -97,12 +101,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'default.db',
+AUTH_DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
+if AUTH_DB_ENGINE == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': AUTH_DB_ENGINE,
+            'NAME':     os.getenv('AUTH_DB_NAME'),
+            'USER':     os.getenv('AUTH_DB_USER'),
+            'PASSWORD': os.getenv('AUTH_DB_PASSWORD'),
+            'HOST':     os.getenv('AUTH_DB_HOST'),
+            'PORT':     os.getenv('AUTH_DB_PORT'),
+            'OPTIONS': {
+                'driver': os.getenv('AUTH_DB_DRIVER', 'ODBC Driver 17 for SQL Server'),
+                'unicode_results': True,
+                'extra_params': 'TrustServerCertificate=yes;Encrypt=no;charset=utf8',
+            } if AUTH_DB_ENGINE == 'mssql' else {},
+        }
+    }
 
 
 # Password validation
@@ -149,7 +171,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTH_MODE = os.getenv('AUTH_MODE', 'HOME')
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000',
-                        'http://127.0.0.1:8001', 'http://localhost:8001']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'True').lower() in ('true', '1', 'yes')
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
