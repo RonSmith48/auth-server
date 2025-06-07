@@ -11,6 +11,8 @@ __pycache__/
 # SQLite
 db.sqlite3
 default.db
+**/migrations/
+migrations/
 
 # Docker
 *.log
