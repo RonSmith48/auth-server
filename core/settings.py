@@ -17,7 +17,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV = os.getenv('ENV', 'dev') 
+ENV = os.getenv('ENV', 'dev')
 dotenv_path = BASE_DIR / f'.env.{ENV}'
 load_dotenv(dotenv_path)
 
@@ -106,7 +106,7 @@ if AUTH_DB_ENGINE == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'db.sqlite3'),
+            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'auth.db'),
         }
     }
 else:
@@ -171,6 +171,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTH_MODE = os.getenv('AUTH_MODE', 'HOME')
-CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'True').lower() in ('true', '1', 'yes')
+CORS_ALLOW_CREDENTIALS = os.getenv(
+    'CORS_ALLOW_CREDENTIALS', 'True').lower() in ('true', '1', 'yes')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
