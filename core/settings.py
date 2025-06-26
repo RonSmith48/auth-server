@@ -17,9 +17,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV = os.getenv('ENV', 'dev')
-dotenv_path = BASE_DIR / f'.env.{ENV}'
-load_dotenv(dotenv_path)
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -61,8 +59,9 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -103,28 +102,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-AUTH_DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
-if AUTH_DB_ENGINE == 'sqlite':
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
+
+if DB_ENGINE == 'django.db.backends.sqlite3':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'auth.db'),
+            'ENGINE': DB_ENGINE,
+            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'backend.db'),
         }
     }
 else:
     DATABASES = {
         'default': {
-            'ENGINE': AUTH_DB_ENGINE,
-            'NAME':     os.getenv('AUTH_DB_NAME'),
-            'USER':     os.getenv('AUTH_DB_USER'),
-            'PASSWORD': os.getenv('AUTH_DB_PASSWORD'),
-            'HOST':     os.getenv('AUTH_DB_HOST'),
-            'PORT':     os.getenv('AUTH_DB_PORT'),
+            'ENGINE': DB_ENGINE,
+            'NAME': os.getenv('AUTH_DB_NAME', 'auth.db'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+            # Only include OPTIONS if using MSSQL
             'OPTIONS': {
-                'driver': os.getenv('AUTH_DB_DRIVER', 'ODBC Driver 17 for SQL Server'),
+                'driver': 'ODBC Driver 17 for SQL Server',
                 'unicode_results': True,
                 'extra_params': 'TrustServerCertificate=yes;Encrypt=no;charset=utf8',
-            } if AUTH_DB_ENGINE == 'mssql' else {},
+            } if 'mssql' in DB_ENGINE else {}
         }
     }
 
@@ -163,7 +164,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -176,3 +178,12 @@ CORS_ALLOW_CREDENTIALS = os.getenv(
     'CORS_ALLOW_CREDENTIALS', 'True').lower() in ('true', '1', 'yes')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 1025))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')

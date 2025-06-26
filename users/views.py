@@ -5,7 +5,7 @@ from django.db import DatabaseError
 from jwt.exceptions import ExpiredSignatureError
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -24,6 +24,9 @@ User = get_user_model()
 
 
 class ActivateUserView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []   # skip JWT auth here
+
     def post(self, request):
         try:
             data = request.data
@@ -73,6 +76,9 @@ class LoginView(TokenObtainPairView):
 
 
 class RegisterUserView(APIView):
+    serializer_class = s.RegisterUserSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []   # skip JWT auth here
 
     def post(self, request):
         try:

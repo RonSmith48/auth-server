@@ -47,19 +47,14 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return value.capitalize()
 
     def create(self, validated_data):
+        # 1. Remove password and initials so they don't collide
         password = validated_data.pop('password')
-        initials = validated_data.get('initials') or (
-            f"{validated_data['first_name'][0]}{validated_data['last_name'][0]}".upper(
-            )
-        )
-        validated_data['initials'] = initials
+        validated_data.pop('initials', None)
+
+        # 3. Create user—initials only passed once
         user = User.objects.create_user(
-            email=validated_data['email'],
-            password=password,
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            initials=initials,
-            role=validated_data.get('role'),
+            **validated_data,   # email, first_name, last_name, role
+            password=password
         )
         return user
 
