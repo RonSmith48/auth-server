@@ -149,6 +149,8 @@ class RegisterUserView(APIView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     def post(self, request, *args, **kwargs):
         # Use the built-in TokenRefreshSerializer to handle the refresh process
