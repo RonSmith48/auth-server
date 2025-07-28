@@ -108,7 +108,7 @@ if DB_ENGINE == 'django.db.backends.sqlite3':
     DATABASES = {
         'default': {
             'ENGINE': DB_ENGINE,
-            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'backend.db'),
+            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'auth.db'),
         }
     }
 else:
