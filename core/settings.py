@@ -102,13 +102,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite3')
 
 if DB_ENGINE == 'django.db.backends.sqlite3':
     DATABASES = {
         'default': {
             'ENGINE': DB_ENGINE,
-            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'backend.db'),
+            'NAME': BASE_DIR / os.getenv('AUTH_DB_NAME', 'auth.db'),
         }
     }
 else:
